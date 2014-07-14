@@ -3,6 +3,8 @@ from django.db import models
 
 class Category(models.Model):
     name = models.CharField(max_length=128, unique=True)
+    likes = 0
+    views = 0
     
     def __unicode__(self):
         return self.name
