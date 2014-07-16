@@ -12,6 +12,11 @@ from rango.forms import UserForm, UserProfileForm
 def register(request):
     context = RequestContext(request)
 
+    if request.session.test_cookie_worked():
+        print ">>>> TEST COOKIE WORKED!"
+        request.session.delete_test_cookie()
+
+    
     registered = False
 
     if request.method == 'POST':
@@ -134,6 +139,8 @@ def add_category(request):
 def index(request):
     context = RequestContext(request)
 
+    request.session.set_test_cookie()
+    
     category_list = Category.objects.order_by('-likes')[:5]
     page_list = Page.objects.order_by('-views')[:5]
     
