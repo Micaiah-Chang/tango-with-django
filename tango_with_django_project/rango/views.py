@@ -174,7 +174,8 @@ def category(request, category_name_url):
 
 @login_required
 def restricted(request):
-    return HttpResponse("Since you're logged in, you can see this text!")
+    context = RequestContext(request)
+    return render_to_response('rango/restricted.html', {}, context)
 
 def decode_url(url):
     return url.replace('_', ' ')
