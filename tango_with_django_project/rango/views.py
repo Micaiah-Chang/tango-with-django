@@ -9,13 +9,10 @@ from rango.forms import CategoryForm, PageForm
 
 from rango.forms import UserForm, UserProfileForm
 
+from datetime import datetime
+
 def register(request):
     context = RequestContext(request)
-
-    if request.session.test_cookie_worked():
-        print ">>>> TEST COOKIE WORKED!"
-        request.session.delete_test_cookie()
-
     
     registered = False
 
@@ -139,22 +136,40 @@ def add_category(request):
 def index(request):
     context = RequestContext(request)
 
-    request.session.set_test_cookie()
-    
-    category_list = Category.objects.order_by('-likes')[:5]
-    page_list = Page.objects.order_by('-views')[:5]
-    
-    context_dict = {'categories' : category_list,
-                    'pages' : page_list}
+    category_list = Category.objects.all()
+    context_dict = { 'categories': category_list}  
 
     for category in category_list:
-        category.url = category.name.replace(' ','_')
-    
+        category.url = encode_url(category.name)
+
+    page_list = Page.objects.order_by('-views')[:5]
+    context_dict['pages'] = page_list
+
+    if request.session.get('last_visit'):
+        last_visit_time = request.session.get('last_visit')
+        visits = request.session.get('visits', 0)
+
+        if (datetime.now() - datetime.strptime(last_visit_time[:-7], "%Y-%m-%d %H:%M:%S")).days > 0:
+            request.session['visits'] = visits + 1
+            request.session['last_visit'] = str(datetime.now())
+
+    else:
+        request.session['last_visit'] = str(datetime.now())
+        request.session['visits'] = 1
+        
     return render_to_response('rango/index.html', context_dict, context)
+
 
 def about(request):
     context = RequestContext(request)
     context_dict = {}
+
+    if request.session.get('visits'):
+        count = request.session.get('visits')
+    else:
+        count = 0
+
+    context_dict['visits'] = count
     
     return render_to_response('rango/about.html', context_dict, context)
 
