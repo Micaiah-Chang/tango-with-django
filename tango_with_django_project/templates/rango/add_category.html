@@ -5,24 +5,27 @@
 {% block body_block %}
   <div class="hero-unit">
 	<h1>Add a Category</h1>
+	<br />
+	<div class="container">
 
-	<form method="post" id="category_form" action="/rango/add_category/">
+	  <form class="span6" method="post" id="category_form" action="/rango/add_category/">
+		
+		{% csrf_token %}
+		
+		{% for hidden in form.hidden_fields %}
+		  {{ hidden }}
+		{% endfor %}
+
+		{% for field in form.visible_fields %}
+		  {{ field.errors}}
+		  {{ field.help_text }}
+		  {{ field }}
+		{% endfor %}
+
+		<br />
+		<button class="btn btn-primary" type="submit" name="submit">Create Category</button>
+	  </form>
 	  
-	  {% csrf_token %}
-	  
-	  {% for hidden in form.hidden_fields %}
-		{{ hidden }}
-	  {% endfor %}
-
-	  {% for field in form.visible_fields %}
-		{{ field.errors}}
-		{{ field.help_text }}
-		{{ field }}
-	  {% endfor %}
-
-	  <br />
-	  <input type="submit" name="submit" value="Create category" />
-	</form>
-	
+	</div>	
   </div>
 {% endblock %} 
