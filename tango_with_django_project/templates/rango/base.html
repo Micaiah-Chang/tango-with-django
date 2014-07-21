@@ -52,19 +52,20 @@
 
 	<div class="container-fluid">
 	  <div class="row-fluid">
-		<div class="well sidebar-nav">
+		<div class="span3">
+		  <div class="well sidebar-nav">
+			
+		  </div>
 		  
+		</div>
+		<div class="span9">
+		  {% block body_block %}
+   	      {% endblock %}
 		</div>
 		
 	  </div>
-	  <div class="span9">
-		{% block body_block %}
-   	    {% endblock %}
-	  </div>
-	  
 	</div>
-	 
-</div>
+
 <hr />
 
 <footer>

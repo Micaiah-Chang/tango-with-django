@@ -3,12 +3,13 @@
 {% block title %} Register {% endblock %}
 
 {% block body_block %}
-  <h1>Register with Rango</h1>
+  <div class="hero-unit">
+	<h1>Register with Rango</h1>
 
-  {% if registered %}
-	Rango says: <strong>Thank you for registering! </strong>
+	{% if registered %}
+	  Rango says: <strong>Thank you for registering! </strong>
     <a href="/rango/">Return to the homepage.</a> <br />
-  
+	
   {% else %}
     Rango says: <strong>Register here!</strong> <br />
 
@@ -16,13 +17,15 @@
     <a href="/rango/">Go back to the homepage</a> <br />
 
 	<form method="post" id="user_form" action="/rango/register/"
-		enctype="multipart/form-data">
-	  {% csrf_token %}
+		  enctype="multipart/form-data">
+		{% csrf_token %}
 
-	  {{ user_form.as_p }}
-	  {{ profile_form.as_p}}
+		{{ user_form.as_p }}
+		{{ profile_form.as_p}}
 
-	  <input type="submit" name="submit" value="Register" />
+		<input type="submit" name="submit" value="Register" />
 	</form>
   {% endif %}
+  
+  </div>
 {% endblock %} 
