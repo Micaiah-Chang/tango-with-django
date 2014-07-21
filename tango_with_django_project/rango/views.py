@@ -67,7 +67,7 @@ def user_login(request):
                 return HttpResponse("Your Rango account is disabled.")
         else:
             print "Invalid login details: {0}, {1}".format(username, password)
-            return HttpResponse("Invalid login details supplied")
+            return HttpResponse("Invalid login details supplied.")
     else:
         return render_to_response('rango/login.html', {}, context)
 
@@ -77,7 +77,7 @@ def user_logout(request):
 
     return HttpResponseRedirect('/rango/')
     
-
+@login_required
 def add_page(request, category_name_url):
     context = RequestContext(request)
 
@@ -115,7 +115,7 @@ def add_page(request, category_name_url):
                               'form': form},
                               context)
 
-
+@login_required
 def add_category(request):
     context = RequestContext(request)
 
