@@ -9,7 +9,7 @@ class CategoryForm(forms.ModelForm):
     name = forms.CharField(max_length=128, help_text="Please enter the category name.")
     views = forms.IntegerField(widget=forms.HiddenInput(), initial=0)
     likes = forms.IntegerField(widget=forms.HiddenInput(), initial=0)
-    
+
     class Meta:
         model = Category
 
@@ -18,10 +18,10 @@ class PageForm(forms.ModelForm):
     url = forms.URLField(max_length=200,help_text="Please enter the URL of the page.")
     views = forms.IntegerField(widget=forms.HiddenInput(), initial=0)
 
-    class Meta:     
+    class Meta:
         model = Page
         fields = ('title', 'url', 'views')
-        
+
     def clean(self):
         cleaned_data = self.cleaned_data
         url = cleaned_data.get('url')
@@ -32,19 +32,23 @@ class PageForm(forms.ModelForm):
 
         return cleaned_data
 
-        
-        
+
+
 class UserForm(forms.ModelForm):
-    password = forms.CharField(widget=forms.PasswordInput())
-    
+    username = forms.CharField(help_text="Please enter a username.")
+    email = forms.CharField(help_text="Please enter your email.")
+    password = forms.CharField(widget=forms.PasswordInput(),
+                               help_text="Please enter a password.")
+
     class Meta:
         model = User
-        fields = ('username', 'email', 'password')
+        fields = ['username', 'email', 'password']
 
 
 class UserProfileForm(forms.ModelForm):
+    website = forms.URLField(help_text="Please enter your website.", required=False)
+    picture = forms.ImageField(help_text="Select a profile image to upload.",required=False)
+
     class Meta:
         model = UserProfile
-        fields = ('website', 'picture')
-        
-        
+        fields = ['website', 'picture']
