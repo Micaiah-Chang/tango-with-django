@@ -5,9 +5,14 @@
 {% block body_block %} 
 {% load static %}
 
-	Rango says: Here is the about page. <br />
-	<br />
+<div class="hero-unit">
+  <h1>About Rango</h1>
+  This is <strong>Rango's about page</strong>. <br />
 
-	You have visited the site: {{ visits }} times.
+  You've visited the site on <strong>{{ visit_count }} occasion(s)</strong>
+
+  Here's a picture of Rango! <br />
+  <img src="{% static 'rango.jpg' %}" alt="Picture of Rango" />
+</div>
 
  {% endblock %}
