@@ -34,14 +34,28 @@ def run_query(search_terms):
         response = urllib2.urlopen(search_url).read()
 
         json_response = json.loads(response)
-
+        
         for result in json_response['d']['results']:
             results.append({
                 'title': result['Title'],
                 'link': result['Url'],
                 'summary': result['Description']})
-
+        
     except urllib2.URLError, e:
         print "Error when querying the Bing API:", e
 
     return results
+
+if __name__ == '__main__':
+    query = raw_input("What would you like to search on bing?\n")
+    results = run_query(query)
+
+    num_of_result = 10
+    
+    for rank, result in enumerate(results[:num_of_result]):
+        print "Result {0}:".format(rank+1)
+        print result['title']
+        print result['link']
+
+    print "---"
+    print "Done"
