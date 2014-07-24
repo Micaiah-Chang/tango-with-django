@@ -1,6 +1,8 @@
 from django.template import RequestContext
 from django.shortcuts import render_to_response
+from django.shortcuts import redirect
 from django.http import HttpResponse, HttpResponseRedirect
+from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 
@@ -27,7 +29,7 @@ def index(request):
         last_visit_time = request.session.get('last_visit')
         visits = request.session.get('visits', 0)
 
-        if (datetime.now() - datetime.strptime(last_visit_time[:-7], "%Y-%m-%d %H:%M:%S")).days > 0:
+        if (datetime.now() - datetime.strptimeme(last_visit_time[:-7], "%Y-%m-%d %H:%M:%S")).days > 0:
             request.session['visits'] = visits + 1
             request.session['last_visit'] = str(datetime.now())
 
@@ -237,39 +239,27 @@ def add_category(request):
 
     return render_to_response('rango/add_category.html', {'form' : form, 'cat_list' : cat_list}, context)
 
+@login_required
+def profile(request):
     context = RequestContext(request)
+    cat_list = get_category_list()
+    context_dict = {'cat_list': cat_list}
 
-    category_name = category_name_url.replace('_', ' ')
-
-    context_dict = {'category_name' : category_name,
-                    'category_name_url': category_name_url}
-
+    u = User.objects.get(username=request.user)
     try:
-        category = Category.objects.get(name=category_name)
+        up = UserProfile.objects.get(user=u)
+    except:
+        up = None
 
-        pages = Page.objects.filter(category=category)
+    context_dict['user'] = u
+    context_dict['user_profile'] = up
+    if request.session.get('last_visit'):
+        last_visit = request.session['last_visit']
 
-        context_dict['pages'] = pages
+    context_dict['last_visit'] =  datetime.strptime(last_visit[:-7], "%Y-%m-%d %H:%M:%S")
 
-        context_dict['category'] = category
-    except Category.DoesNotExist:
-        pass
-
-    return render_to_response('rango/category.html', context_dict, context)
-
-def search(request):
-    context = RequestContext(request)
-    result_list = []
-    
-    if request.method == 'POST':
-        query = request.POST['query'].strip()
-
-        if query:
-            result_list = run_query(query)
-
-    return render_to_response('rango/search.html', {'result_list': result_list},context)
-
-
+    return render_to_response('rango/profile.html',
+                              context_dict, context)
     
 
 @login_required
