@@ -10,16 +10,47 @@
 	{% if pages %}
 	  <ul>
 		{% for page in pages%}
-		  <li><a href="{{page.url}}">{{ page.title }}</a></li>
+		  <li>
+			<a href="/rango/goto/?page_id={{ page.id }}">{{ page.title }} </a>
+		  {% if page.views > 1 %}
+			- ({{ page.views }} views )
+			{% elif page.views == 1 %}
+			- ({{ page.views }} view )
+		  {% endif %}
+		  </li>
 		{% endfor%}
 	  </ul>
 	{% else %}
 	  <strong>No pages currently in category.</strong>
 	{% endif %}
 	
-  {% if user.is_authenticated %}
-	<a href="/rango/category/{{category_name_url}}/add_page/">Add a Page</a>
-  {% endif %}
+	{% if user.is_authenticated %}
+	  <a href="/rango/goto/?page_id={{ page_id }}"> Add a Page</a>
+	{% endif %}
+
+	<div class="container-fluid">
+	  <form class="form-signin span8" method="post" id="user_form" action="/rango/category/{{category_name_url}}/">
+		{% csrf_token %}
+		<input type="text" class="input-long search-query" name="query" value="{{ category_name }} " id="query" size="50"/>
+		<input class="btn btn-primary" type="submit" name="submit" value="Search" />
+		<br />
+	  </form>
+
+	  <div class="container-fluid">
+		{% if result_list %}
+		  <div style="clear:both;">
+			<ol>
+	  {% for result in result_list %}
+		<li>
+		  <strong><a href="{{ result.link }}"> {{ result.title }}  </a></strong> <br />
+		  <p> {{ result.summary }} </p>
+		</li>
+	  {% endfor %}
+			</ol>
+		  </div>
+			  {% endif %}
+	  </div>
+	</div>
   
   </div>
 {% endblock %}
