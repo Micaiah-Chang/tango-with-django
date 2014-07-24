@@ -106,6 +106,24 @@ def search(request):
 
     return render_to_response('rango/search.html', {'result_list': result_list, 'cat_list' : cat_list},context)
 
+def track_url(request):
+    context = RequestContext(request)
+
+    url = "/rango/"
+    page_id = None
+    if request.method == 'GET':
+        if 'page_id' in request.GET:
+            page_id = request.GET['page_id']
+            try:
+                page = Page.objects.get(id=page_id)
+                page.views = page.views + 1
+                page.save()
+                url = page.url
+            except:
+                pass
+    
+    return redirect(url)
+
 def register(request):
     context = RequestContext(request)
     
