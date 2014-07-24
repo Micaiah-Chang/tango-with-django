@@ -8,18 +8,6 @@
   {% else %}
     <h1>Rango says... hello world!</h1>
   {% endif%}
-{% if categories %}
-	  <ul>
-		{% for category in categories %}
-		  <li>
-			<a href="/rango/category/{{ category.url }}">{{ category.name }}</a>
-		  </li>
-		{% endfor %}
-	  </ul>
-	{% else %}
-	  <strong>There are no categories present.</strong><br />
-	{% endif %}
-
 
 	<h2>Top Five Pages</h2>
 	{% if pages %}
