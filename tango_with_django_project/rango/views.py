@@ -18,10 +18,10 @@ from datetime import datetime
 def index(request):
     context = RequestContext(request)
     context_dict = {}
-    
+
     cat_list = get_category_list()
     context_dict['cat_list'] = cat_list
-    
+
     page_list = Page.objects.order_by('-views')[:5]
     context_dict['pages'] = page_list
 
@@ -36,10 +36,10 @@ def index(request):
     else:
         request.session['last_visit'] = str(datetime.now())
         request.session['visits'] = 1
-        
+
     return render_to_response('rango/index.html', context_dict, context)
 
-    
+
 
 def about(request):
     context = RequestContext(request)
@@ -47,14 +47,14 @@ def about(request):
 
     cat_list = get_category_list()
     context_dict['cat_list'] = cat_list
-    
+
     if request.session.get('visits'):
         count = request.session.get('visits')
     else:
         count = 0
 
     context_dict['visits'] = count
-    
+
     return render_to_response('rango/about.html', context_dict, context)
 
 def category(request, category_name_url):
@@ -87,24 +87,6 @@ def category(request, category_name_url):
 
     return render_to_response('rango/category.html', context_dict, context)
 
-
-@login_required
-def like_category(request):
-    context = RequestContext(request)
-    cat_id = None
-    if request.method == 'GET':
-        cat_id = request.GET['category_id']
-
-    likes = 0
-    if cat_id:
-        category = Category.objects.get(id=int(cat_id))
-        if category:
-            likes = category.likes + 1
-            category.likes =  likes
-            category.save()
-
-    return HttpResponse(likes)    
-
 def suggest_category(request):
     context = RequestContext(request)
     cat_list = []
@@ -115,7 +97,7 @@ def suggest_category(request):
     cat_list = get_category_list(8, starts_with)
 
     return render_to_response('rango/category_list.html', {'cat_list': cat_list }, context)
-    
+
 
 
 def search(request):
@@ -123,7 +105,7 @@ def search(request):
     result_list = []
 
     cat_list = get_category_list()
-    
+
     if request.method == 'POST':
         query = request.POST['query'].strip()
 
@@ -147,17 +129,17 @@ def track_url(request):
                 url = page.url
             except:
                 pass
-    
+
     return redirect(url)
 
 def register(request):
     context = RequestContext(request)
-    
+
     context_dict = {}
     cat_list = get_category_list()
 
     context_dict['cat_list'] = cat_list
-    
+
     registered = False
 
     if request.method == 'POST':
@@ -166,7 +148,7 @@ def register(request):
 
         if user_form.is_valid() and profile_form.is_valid():
             user = user_form.save()
-            
+
             user.set_password(user.password)
             user.save()
 
@@ -189,7 +171,7 @@ def register(request):
     context_dict['registered'] = registered
     context_dict['user_form'] = user_form
     context_dict['profile_form'] = profile_form
-     
+
     return render_to_response('rango/register.html',    context_dict, context)
 
 
@@ -198,7 +180,7 @@ def user_login(request):
     context = RequestContext(request)
 
     cat_list = get_category_list()
-    
+
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
@@ -222,7 +204,7 @@ def user_logout(request):
     logout(request)
 
     return HttpResponseRedirect('/rango/')
-    
+
 @login_required
 def add_page(request, category_name_url):
     context = RequestContext(request)
@@ -265,6 +247,48 @@ def add_page(request, category_name_url):
                               context)
 
 @login_required
+def like_category(request):
+    context = RequestContext(request)
+    cat_id = None
+    if request.method == 'GET':
+        cat_id = request.GET['category_id']
+
+    likes = 0
+    if cat_id:
+        category = Category.objects.get(id=int(cat_id))
+        if category:
+            likes = category.likes + 1
+            category.likes =  likes
+            category.save()
+
+    return HttpResponse(likes)
+
+@login_required
+def auto_add_page(request):
+    context = RequestContext(request)
+
+    context_dict = {}
+    cat_id = None
+    url = None
+    title = None
+    if request.method == 'GET':
+        cat_id = request.GET['category_id']
+        url = request.GET['url']
+        title = request.GET['title']
+        
+        if cat_id:
+            category = Category.objects.get(id=int(cat_id))
+            p = Page.objects.get_or_create(category=category, title=title, url=url)
+
+            pages = Page.objects.filter(category=category).order_by('-views')
+
+            context_dict['pages'] = pages
+
+    return render_to_response('rango/page_list.html' , context_dict, context)
+
+
+
+@login_required
 def add_category(request):
     context = RequestContext(request)
 
@@ -304,13 +328,13 @@ def profile(request):
 
     return render_to_response('rango/profile.html',
                               context_dict, context)
-    
+
 
 @login_required
 def restricted(request):
     context = RequestContext(request)
     cat_list = get_category_list()
-    
+
     return render_to_response('rango/restricted.html', {'cat_list':cat_list}, context)
 
 def decode_url(url):
@@ -318,8 +342,8 @@ def decode_url(url):
 
 def encode_url(url):
     return url.replace(' ', '_')
-    
-    
+
+
 def get_category_list(max_results=0, starts_with=''):
     category_list = []
 
@@ -337,4 +361,3 @@ def get_category_list(max_results=0, starts_with=''):
         category.url = encode_url(category.name)
 
     return category_list
-    
