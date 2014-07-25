@@ -60,35 +60,31 @@ def about(request):
 def category(request, category_name_url):
     context = RequestContext(request)
 
-    category_name = category_name_url.replace('_', ' ')
+    category_name = decode_url(category_name_url)
 
-    context_dict = {'category_name' : category_name,
-                    'category_name_url': category_name_url}
+    context_dict = {'category_name': category_name, 'category_name_url': category_name_url}
 
     cat_list = get_category_list()
     context_dict['cat_list'] = cat_list
-    
+
     try:
-        category = Category.objects.get(name=category_name)
 
-        pages = Page.objects.filter(category=category)
-
-        context_dict['pages'] = sorted(pages, key=lambda x: x.views, reverse=True)
-
+        category = Category.objects.get(name__iexact=category_name)
         context_dict['category'] = category
+
+        pages = Page.objects.filter(category=category).order_by('-views')
+
+
+        context_dict['pages'] = pages
     except Category.DoesNotExist:
         pass
 
-    result_list = []
-    
     if request.method == 'POST':
         query = request.POST['query'].strip()
-        
         if query:
             result_list = run_query(query)
             context_dict['result_list'] = result_list
 
-    
     return render_to_response('rango/category.html', context_dict, context)
 
 
@@ -324,8 +320,18 @@ def encode_url(url):
     return url.replace(' ', '_')
     
     
-def get_category_list():
-    category_list = Category.objects.all()
+def get_category_list(max_results=0, starts_with=''):
+    category_list = []
+
+    if starts_with:
+        category_list = Category.objects.filter(name__istartswith=starts_with)
+    else:
+        category_list = Category.objects.all()
+
+    if max_results > 0:
+        if len(category_list) > max_results:
+            category_list = category_list[:max_results]
+
 
     for category in category_list:
         category.url = encode_url(category.name)
