@@ -29,7 +29,7 @@ def index(request):
         last_visit_time = request.session.get('last_visit')
         visits = request.session.get('visits', 0)
 
-        if (datetime.now() - datetime.strptimeme(last_visit_time[:-7], "%Y-%m-%d %H:%M:%S")).days > 0:
+        if (datetime.now() - datetime.strptime(last_visit_time[:-7], "%Y-%m-%d %H:%M:%S")).days > 0:
             request.session['visits'] = visits + 1
             request.session['last_visit'] = str(datetime.now())
 
